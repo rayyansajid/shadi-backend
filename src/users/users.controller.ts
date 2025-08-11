@@ -14,18 +14,21 @@ export class UsersController {
     getMe(@Req() req) {
         return req.user; // decoded JWT payload
     }
-
+    
+    @UseGuards(AuthGuard('jwt'))
     @Get()
     async findAll() {
         return this.usersService.findAll();
     }
-
+    
+    @UseGuards(AuthGuard('jwt'))
     @Get(':id')
     async findOne(@Param('id') id: string) {
         return this.usersService.findOne(id);
     }
-
-
+    
+    
+    @UseGuards(AuthGuard('jwt'))
     @Post()
     async create(@Body() createuserDto:CreateUserDto){
         return this.usersService.create(createuserDto);
