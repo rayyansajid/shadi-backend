@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
-import { Role } from 'generated/prisma';
+import { Role, VendorCategory  } from 'generated/prisma';
 
 export class SignupDto {
   @IsEmail()
@@ -18,4 +18,26 @@ export class SignupDto {
   @IsOptional()
   @IsEnum(Role)
   role?: Role;
+
+  @IsOptional()
+  businessName?: string;
+
+  @IsOptional()
+  @IsEnum(VendorCategory)
+  vendorCategory?: VendorCategory;
+
+  @IsOptional()
+  city?: string;
+
+  @IsOptional()
+  area?: string;
+
+  @IsOptional()
+  address?: string;
+
+  @IsOptional()
+  description?: string;
+
+  @IsOptional()
+  logoUrl?: string;
 }

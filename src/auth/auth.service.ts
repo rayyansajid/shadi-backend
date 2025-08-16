@@ -29,6 +29,21 @@ export class AuthService {
         role: dto.role || 'CUSTOMER',
         },
     });
+    if (dto.role === 'VENDOR') {
+      await this.prisma.vendorProfile.create({
+        data: {
+          userId: user.id,
+          businessName: dto.businessName || 'New Business',
+          category: dto.vendorCategory || 'OTHER',
+          city: dto.city || 'Unknown',
+          area: dto.area || null,
+          address: dto.address || 'Not specified',
+          description: dto.description || null,
+          logoUrl: dto.logoUrl || null,
+          status: 'PENDING',
+        },
+      });
+    }
 
     const tokens = this.generateTokens({
         id: user.id,

@@ -22,7 +22,7 @@ export class AuthController {
   @Post('refresh')
   async refreshTokens(@Req() req) {
     // console.log(JSON.stringify(req))
-    console.log(JSON.stringify(req.user))
+    // console.log(JSON.stringify(req.user))
     const userId = req.user.id;
     const refreshToken = req.cookies?.refresh_token || req.body?.refreshToken;
     return this.authService.refreshTokens(userId, refreshToken);

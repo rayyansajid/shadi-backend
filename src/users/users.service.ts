@@ -25,10 +25,8 @@ export class UsersService {
 
   async create(data: CreateUserDto){
     try {
-      // Hash the password first
       const passwordHash = await bcrypt.hash(data.passwordHash, 10);
 
-      // Build the object for Prisma manually
       const user = await this.prisma.user.create({
         data: {
           email: data.email,

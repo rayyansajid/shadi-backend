@@ -10,19 +10,17 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req: Request) => {
-          // From cookies
           if (req.cookies?.refresh_token) {
             return req.cookies.refresh_token;
           }
-          // Or from body
           if (req.body?.refreshToken) {
             return req.body.refreshToken;
           }
           return ExtractJwt.fromAuthHeaderAsBearerToken()(req);
         },
       ]),
-      secretOrKey: configService.get<string>("JWT_REFRESH_SECRET"), // or process.env.REFRESH_TOKEN_SECRET
-      passReqToCallback: true, // ✅ Allowed because we're using StrategyOptionsWithRequest
+      secretOrKey: configService.get<string>("JWT_REFRESH_SECRET"), 
+      passReqToCallback: true, 
     } as StrategyOptionsWithRequest);
   }
 
@@ -31,13 +29,10 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
                          req.body?.refreshToken || 
                          req.headers?.authorization?.replace('Bearer ', '');
     
-    console.log('Extracted refresh token:', refreshToken);
-
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not found');
     }
 
-    // You could verify token is still stored in DB here
     return { ...payload, refreshToken };
   }
 }

@@ -15,18 +15,158 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  phone        String?
-  role         Role     @default(CUSTOMER)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  refreshToken   String?
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  phone         String?
+  role          Role  @default(CUSTOMER)
+  refreshToken  String?   // For auth refresh token storage
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  //vendorProfileId String?
+  vendorProfile VendorProfile?
+  bookings      Booking[]
+  reviews       Review[]
+}
+
+model VendorProfile {
+  id           String        @id @default(uuid())
+
+  userId      String      @unique
+  user        User       @relation(fields: [userId], references: [id])
+  
+  businessName String
+  category     VendorCategory
+
+  city        String
+  area        String?
+  address     String
+
+  description  String?
+  logoUrl      String?
+  ratingAvg    Float?        @default(0)
+  status       VendorStatus  @default(PENDING)
+
+  // Relations
+  listings  Listing[]
+  reviews   Review[]
+}
+
+model Listing {
+  id           String           @id @default(uuid())
+  vendorId     String
+  title        String
+  price        Int
+  description  String?
+  thumbnailUrl String?
+  category     ListingCategory
+  location     String
+  maxGuests    Int?
+  createdAt    DateTime         @default(now())
+
+  // Relations
+  vendor        VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  availabilities Availability[]
+  bookingItems   BookingItem[]
+}
+
+model Availability {
+  id         String       @id @default(uuid())
+  listingId  String
+  date       DateTime     
+  isAvailable Boolean     @default(true)
+  updatedAt   DateTime    @updatedAt
+  
+  // Relations
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  @@unique([listingId, date])
+}
+
+model Booking {
+  id          String         @id @default(uuid())
+  userId      String         
+  eventDate   DateTime
+  guestCount  Int
+  status      BookingStatus  @default(PENDING)
+  totalPrice  Int
+  notes       String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [id])
+  bookingItems BookingItem[]
+}
+
+model BookingItem {
+  id               String          @id @default(uuid())
+  bookingId        String
+  listingId        String
+  priceAtBooking   Int
+  //serviceCategory  ServiceCategory
+
+  // Relations
+  booking Booking @relation(fields: [bookingId], references: [id])
+  listing Listing @relation(fields: [listingId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  vendorId  String
+  rating    Int
+  comment   String?
+  photoUrl  String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user   User          @relation(fields: [userId], references: [id])
+  vendor VendorProfile @relation(fields: [vendorId], references: [id])
 }
 
 enum Role {
+  ADMIN
   VENDOR
   CUSTOMER
 }
+
+enum VendorCategory {
+  HALL
+  CATERING
+  CAR_RENTAL
+  BEAUTY
+  OTHER
+}
+
+enum ListingCategory {
+  HALL
+  CATERING
+  CAR_RENTAL
+  BEAUTY
+  OTHER
+}
+
+enum VendorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  INACTIVE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+//enum ServiceCategory {
+//  HALL
+//  CATERING
+//  CAR
+//  BEAUTY
+//  OTHER
+//}
